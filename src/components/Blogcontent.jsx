@@ -95,10 +95,10 @@ const Blogcontent = () => {
                                         </div>
 
                                         <div className="text-left w-full md:w-[70%]">
-                                            <span className="text-sm sm:text-lg text-green-500 font-semibold block mb-1">
+                                            <span className="text-sm xl:text-base text-green-500 font-bold block mb-1">
                                                 Previous Post
                                             </span>
-                                            <p className="font-semibold text-xs sm:text-sm md:text-base break-words">
+                                            <p className="font-semibold text-xs xl:text-sm break-words">
                                                 {prevPost.title}
                                             </p>
                                         </div>
@@ -123,10 +123,10 @@ const Blogcontent = () => {
                                         </div>
 
                                         <div className="text-left w-full md:w-[70%]">
-                                            <span className="text-sm sm:text-lg text-green-500 font-semibold block mb-1">
+                                            <span className="text-sm xl:text-base text-green-500 font-bold block mb-1">
                                                 Next Post
                                             </span>
-                                            <p className="font-semibold text-xs sm:text-sm md:text-base break-words">
+                                            <p className="font-semibold text-xs xl:text-sm break-words">
                                                 {nextPost.title}
                                             </p>
                                         </div>
@@ -134,8 +134,6 @@ const Blogcontent = () => {
                                 </div>
                             )}
                         </div>
-
-
 
 
                         {/* Advertisement Section */}
