@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import thumbnail from "@/assets/thumbnail.png";
 import { LiaLongArrowAltRightSolid } from "react-icons/lia";
 import { BsCalendarDate } from "react-icons/bs";
@@ -10,7 +10,24 @@ import Link from "next/link";
 
 const Main = () => {
 
-    const [data, setData] = useState(blogData.slice(0, 6));
+    //const [data, setData] = useState(blogData.slice(0, 6));
+
+    const [popularBlogs, setPopularBlogs] = useState([]);
+    
+      useEffect(() => {
+        const fetchBlogs = async () => {
+          try {
+            const res = await fetch("/api/blog");
+            const data = await res.json();
+            if (data.success) {
+                setPopularBlogs(data.blogs); // Show only 5 recent blogs
+            }
+          } catch (error) {
+            console.error("Error fetching blogs:", error);
+          }
+        };
+        fetchBlogs();
+      }, []);
 
     return (
         <div className="container mx-auto px-4 lg:px-1 my-20">
@@ -21,14 +38,14 @@ const Main = () => {
             <div className="flex flex-col lg:flex-row gap-6">
                 {/* LEFT SIDE - BLOG POSTS */}
                 <div className="flex flex-col gap-6 w-full lg:w-3/4">
-                    {data.map((item, index) => (
+                    {popularBlogs.map((item, index) => (
                         <React.Fragment key={index}>
                             <div className="p-6 rounded-xl bg-gray-100 shadow-md flex flex-col lg:flex-row gap-6 items-center">
                                 {/* Image Section */}
                                 <div className="w-full lg:w-1/2">
-                                    <Link href={`/blog/${item.id}`}>
+                                    <Link href={`/blog/${item._id}`}>
                                         <Image
-                                            src={thumbnail}
+                                            src={item.thumbnail}
                                             alt="thumbnail-image"
                                             className="rounded-xl w-full"
                                             width={500}
@@ -53,7 +70,7 @@ const Main = () => {
                                     </div>
 
                                     {/* Title */}
-                                    <Link href={`/blog/${item.id}`}>
+                                    <Link href={`/blog/${item._id}`}>
                                         <h2 className="text-3xl md:text-4xl font-bold leading-tight">
                                             {item.title}
                                         </h2>
@@ -65,7 +82,7 @@ const Main = () => {
                                     {/* Date */}
                                     <div className="flex items-center gap-2 text-gray-600">
                                         <BsCalendarDate size={20} />
-                                        <time dateTime="2025-02-12">{item.date}</time>
+                                        <time dateTime="2025-02-12">{item.createdAt}</time>
                                     </div>
                                 </div>
                             </div>

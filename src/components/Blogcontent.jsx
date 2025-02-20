@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import thumbnail from "@/assets/thumbnail.png";
 import { BsCalendarDate } from "react-icons/bs";
 import Image from "next/image";
@@ -11,6 +11,25 @@ const Blogcontent = () => {
     const { id } = useParams(); // Get the blog ID from the URL
     const router = useRouter();
 
+    const [blog, setBlog] = useState(null);
+
+    useEffect(() => {
+        const fetchBlogs = async () => {
+          try {
+            const res = await fetch(`/api/blog?id=${id}`);
+            const data = await res.json();
+            if (data.success) {
+                console.log("---------")
+                console.log(data.blogs.tags);
+              setBlog(data.blogs); // Show only 5 recent blogs
+            }
+          } catch (error) {
+            console.error("Error fetching blogs:", error);
+          }
+        };
+        fetchBlogs();
+      }, []);
+
     const currentIndex = blogData.findIndex((post) => post.id === id);
     const data = blogData[currentIndex]; // Get the current blog post
 
@@ -18,7 +37,7 @@ const Blogcontent = () => {
     const prevPost = currentIndex > 0 ? blogData[currentIndex - 1] : null;
     const nextPost = currentIndex < blogData.length - 1 ? blogData[currentIndex + 1] : null;
 
-    if (!data) {
+    if (!blog) {
         return <p className="text-center text-xl mt-10">Blog not found!</p>;
     }
 
@@ -31,7 +50,7 @@ const Blogcontent = () => {
                         {/* Image Section */}
                         <div className="w-full">
                             <Image
-                                src={thumbnail}
+                                src={blog.thumbnail}
                                 alt="thumbnail-image"
                                 className="rounded-xl w-full"
                                 width={500}
@@ -44,7 +63,7 @@ const Blogcontent = () => {
                         <div className="flex flex-col gap-4 w-full">
                             {/* Tags */}
                             <div className="flex flex-wrap gap-2">
-                                {data.tags.map((tag, index) => (
+                                {blog.tags.map((tag, index) => (
                                     <span
                                         key={index}
                                         className="bg-red-500 text-white px-3 py-1 rounded-full text-sm"
@@ -56,23 +75,23 @@ const Blogcontent = () => {
 
                             {/* Title */}
                             <h2 className="text-3xl md:text-4xl font-bold leading-tight">
-                                {data.title}
+                                {blog.title}
                             </h2>
 
                             {/* Date */}
                             <div className="flex items-center gap-2 text-gray-600">
                                 <BsCalendarDate size={20} />
-                                <time dateTime={data.date}>{data.date}</time>
+                                <time dateTime={blog.createdAt}>{blog.createdAt}</time>
                             </div>
 
                             {/* Description */}
                             <h2 className="text-xl font-bold">Description</h2>
-                            <p className="text-gray-700">{data.description}</p>
+                            <p className="text-gray-700">{blog.description}</p>
 
                             {/* Blog Content - Rendering HTML String */}
                             <div
                                 className="text-gray-800 leading-relaxed"
-                                dangerouslySetInnerHTML={{ __html: data.blogContent }}
+                                dangerouslySetInnerHTML={{ __html: blog.blogContent }}
                             ></div>
                         </div>
 

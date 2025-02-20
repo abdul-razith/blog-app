@@ -1,7 +1,7 @@
 "use client";
 
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BsCalendarDate } from 'react-icons/bs';
 import { LiaLongArrowAltRightSolid } from 'react-icons/lia';
 import thumbnail from '@/assets/thumbnail.png';
@@ -10,7 +10,25 @@ import Link from 'next/link';
 
 const Suggested = () => {
 
-    const [suggest, setSuggest] = useState(blogData.slice(0, 4));
+    //const [suggest, setSuggest] = useState(blogData.slice(0, 4));
+
+    const [suggestBlogs, setSuggestBlogs] = useState([]);
+        
+          useEffect(() => {
+            const fetchBlogs = async () => {
+              try {
+                const res = await fetch("/api/blog");
+                const data = await res.json();
+                if (data.success) {
+                    setSuggestBlogs(data.blogs); // Show only 5 recent blogs
+                }
+              } catch (error) {
+                console.error("Error fetching blogs:", error);
+              }
+            };
+            fetchBlogs();
+          }, []);
+
     return (
         <div className="container mx-auto px-4 my-10">
             {/* Section Title */}
@@ -18,12 +36,12 @@ const Suggested = () => {
 
             {/* Responsive Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {suggest.map((post) => (
-                    <div key={post.id} className="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+                {suggestBlogs.map((post, index) => (
+                    <div key={index} className="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
                         {/* Thumbnail */}
                         <div className="relative w-full h-48">
-                            <Link href={`/blog/${post.id}`}>
-                                <Image src={thumbnail} alt={post.title} layout="fill" objectFit="cover" />
+                            <Link href={`/blog/${post._id}`}>
+                                <Image src={post.thumbnail} alt={post.title} layout="fill" objectFit="cover" />
                             </Link>
                         </div>
 
@@ -38,13 +56,13 @@ const Suggested = () => {
                                 ))}
                             </div>
 
-                            <Link href={`/blog/${post.id}`}>
+                            <Link href={`/blog/${post._id}`}>
                                 <h2 className="text-lg font-semibold mt-2">{post.title}</h2>
                             </Link>
                             {/* Date */}
                             <div className="flex items-center text-gray-600 text-sm mt-2">
                                 <BsCalendarDate className="mr-2" />
-                                <time>{post.date}</time>
+                                <time>{post.createdAt}</time>
                             </div>
 
                         </div>
