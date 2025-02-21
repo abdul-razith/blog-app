@@ -12,13 +12,13 @@ export async function GET(request) {
       await LoadDB(); // Ensure DB connection
       console.log("GET Blog API Called");
 
-      const url = new URL(request.url);
-      //const blogId = url.searchParams.get("id");
-      const blogId = "67b70f2270459353be153f44";
+      //const blogId = "67b70f2270459353be153f44";
+      const { searchParams} = new URL(request.url);
+      const blogId = searchParams.get("id");
       console.log("ROUTE BLOG ID" , blogId);
 
 
-      if (!blogId) { //put this symbol and remove the symbol to fix the errors "! not symbol"
+      if (blogId) { //put this symbol and remove the symbol to fix the errors "! not symbol"
           const blog = await BlogModel.findById(blogId);
           if (!blog) {
               return NextResponse.json({ success: false, message: "Blog not found" }, { status: 404 });

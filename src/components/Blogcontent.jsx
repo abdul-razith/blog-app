@@ -12,30 +12,45 @@ const Blogcontent = () => {
     const router = useRouter();
 
     const [blog, setBlog] = useState(null);
+    const [prevPost, setPrevPost] = useState(null);
+    const [nextPost, setNextPost] = useState(null);
+
+    console.log("BLOG ID FROM URL :", id);
 
     useEffect(() => {
-        const fetchBlogs = async () => {
-          try {
-            const res = await fetch(`/api/blog?id=${id}`);
-            const data = await res.json();
-            if (data.success) {
-                console.log("---------")
-                console.log(data.blogs.tags);
-              setBlog(data.blogs); // Show only 5 recent blogs
+        const fetchBlog = async () => {
+            try {
+                const res = await fetch(`/api/blog?id=${id}`);
+                const data = await res.json();
+                if (data.success) {
+                    setBlog(data.blogs);
+                }
+            } catch (error) {
+                console.error("Error fetching blog:", error);
             }
-          } catch (error) {
-            console.error("Error fetching blogs:", error);
-          }
         };
-        fetchBlogs();
-      }, []);
 
-    const currentIndex = blogData.findIndex((post) => post.id === id);
-    const data = blogData[currentIndex]; // Get the current blog post
+        const fetchAdjacentBlogs = async () => {
+            try {
+                const res = await fetch(`/api/blog`); // Fetch all blogs
+                const data = await res.json();
 
-    // Get the previous and next posts
-    const prevPost = currentIndex > 0 ? blogData[currentIndex - 1] : null;
-    const nextPost = currentIndex < blogData.length - 1 ? blogData[currentIndex + 1] : null;
+                if (data.success) {
+                    const blogs = data.blogs;
+                    const currentIndex = blogs.findIndex(blog => blog._id === id);
+
+                    // Get the previous and next posts
+                    setPrevPost(currentIndex > 0 ? blogs[currentIndex - 1] : null);
+                    setNextPost(currentIndex < blogs.length - 1 ? blogs[currentIndex + 1] : null);
+                }
+            } catch (error) {
+                console.error("Error fetching adjacent blogs:", error);
+            }
+        };
+
+        fetchBlog();
+        fetchAdjacentBlogs();
+    }, [id]);
 
     if (!blog) {
         return <p className="text-center text-xl mt-10">Blog not found!</p>;
@@ -98,18 +113,20 @@ const Blogcontent = () => {
                         {/* Next & Previous post navigation */}
                         <div className="flex flex-col sm:flex-row justify-between w-full mt-6 gap-4 sm:gap-6">
                             {/* Previous Post */}
-                            {prevPost && (
+                            {prevPost ? (
                                 <div className="w-full sm:w-[50%]">
                                     <button
-                                        onClick={() => router.push(`/blog/${prevPost.id}`)}
+                                        onClick={() => router.push(`/blog/${prevPost._id}`)}
                                         className="bg-gray-700 text-white px-4 py-2 rounded-md hover:bg-gray-900 flex items-center gap-3 w-full"
                                     >
                                         {/* Show Image Only from 768px (md) */}
                                         <div className="hidden md:block w-[30%]">
                                             <Image
-                                                src={thumbnail}
+                                                src={prevPost.thumbnail}
                                                 alt="Previous Post Thumbnail"
                                                 className="rounded-md w-full"
+                                                width={100}
+                                                height={100}
                                             />
                                         </div>
 
@@ -123,21 +140,25 @@ const Blogcontent = () => {
                                         </div>
                                     </button>
                                 </div>
+                            ) : (
+                                <div className="hidden sm:block w-[50%]"></div> // Empty div to keep layout balance
                             )}
 
                             {/* Next Post */}
-                            {nextPost && (
-                                <div className="w-full sm:w-[50%] flex sm:justify-end">
+                            {nextPost ? (
+                                <div className={`w-full sm:w-[50%] flex ${!prevPost ? 'sm:justify-start' : 'sm:justify-end'}`}>
                                     <button
-                                        onClick={() => router.push(`/blog/${nextPost.id}`)}
+                                        onClick={() => router.push(`/blog/${nextPost._id}`)}
                                         className="bg-gray-700 text-white px-4 py-2 rounded-md hover:bg-gray-900 flex items-center gap-3 w-full"
                                     >
                                         {/* Show Image Only from 768px (md) */}
                                         <div className="hidden md:block w-[30%]">
                                             <Image
-                                                src={thumbnail}
+                                                src={nextPost.thumbnail}
                                                 alt="Next Post Thumbnail"
                                                 className="rounded-md w-full"
+                                                width={100}
+                                                height={100}
                                             />
                                         </div>
 
@@ -151,6 +172,8 @@ const Blogcontent = () => {
                                         </div>
                                     </button>
                                 </div>
+                            ) : (
+                                <div className="hidden sm:block w-[50%]"></div> // Empty div to keep layout balance
                             )}
                         </div>
 

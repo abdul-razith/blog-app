@@ -5,7 +5,7 @@ export default function Home({params}) {
   return (
     <main>
       <Blogcontent />
-      {/* <Suggested /> */}
+      <Suggested />
     </main>
   );
 }
