@@ -7,40 +7,39 @@ const LoadDB = async () => {
   await ConnectDB();
 };
 
+// ✅ GET API: Fetch All Blogs or a Single Blog
 export async function GET(request) {
   try {
-      await LoadDB(); // Ensure DB connection
-      console.log("GET Blog API Called");
+    await LoadDB();
+    console.log("GET Blog API Called");
 
-      //const blogId = "67b70f2270459353be153f44";
-      const { searchParams} = new URL(request.url);
-      const blogId = searchParams.get("id");
-      console.log("ROUTE BLOG ID" , blogId);
+    const { searchParams } = new URL(request.url);
+    const blogId = searchParams.get("id");
+    console.log("ROUTE BLOG ID:", blogId);
 
-
-      if (blogId) { //put this symbol and remove the symbol to fix the errors "! not symbol"
-          const blog = await BlogModel.findById(blogId);
-          if (!blog) {
-              return NextResponse.json({ success: false, message: "Blog not found" }, { status: 404 });
-          }
-          return NextResponse.json({ success: true, blogs: blog }, { status: 200 });
-      } else {
-          const blogs = await BlogModel.find({}).sort({ createdAt: -1 });
-          return NextResponse.json({ success: true, blogs }, { status: 200 });
+    if (blogId) {
+      const blog = await BlogModel.findById(blogId);
+      if (!blog) {
+        return NextResponse.json(
+          { success: false, message: "Blog not found" },
+          { status: 404 }
+        );
       }
+      return NextResponse.json({ success: true, blog }, { status: 200 });
+    } else {
+      const blogs = await BlogModel.find({}).sort({ createdAt: -1 });
+      return NextResponse.json({ success: true, blogs }, { status: 200 });
+    }
   } catch (error) {
-      console.error("Error fetching blogs:", error);
-      return NextResponse.json(
-          { success: false, message: "Failed to fetch blogs" },
-          { status: 500 }
-      );
+    console.error("Error fetching blogs:", error);
+    return NextResponse.json(
+      { success: false, message: "Failed to fetch blogs" },
+      { status: 500 }
+    );
   }
 }
 
-
-
-
-// ✅ Get Next Blog ID for Folder Naming (Blog_1, Blog_2, ...)
+// ✅ Get Next Blog ID for Folder Naming
 async function getNextBlogId() {
   const blogCount = await BlogModel.countDocuments();
   return blogCount + 1; // If 5 blogs exist, next will be Blog_6
@@ -60,24 +59,38 @@ async function uploadImageToCloudinary(image, folder, imageName) {
             console.error("❌ Cloudinary Upload Error:", error);
             return reject(error);
           }
-          resolve(result.secure_url); // Cloudinary URL
+          resolve(result.secure_url);
         }
       )
       .end(buffer);
   });
 }
 
+// ✅ Get IST Date-Time & Blog Folder Name
+function getISTDateTime(blogTitle) {
+  const now = new Date();
+  const istOffset = 5.5 * 60 * 60 * 1000; // IST = UTC +5:30
+  const istDate = new Date(now.getTime() + istOffset);
 
+  // Format date-time as YYYY-MM-DDTHH:mm:ss.sss+05:30 (MongoDB format)
+  const mongoDBDate = istDate.toISOString();
+
+  // ✅ Folder Naming: "Blog_blog_post_title"
+  const sanitizedTitle = blogTitle.replace(/\s+/g, '_'); // Replace spaces with underscores
+  const specificFolderName = `Blog_${sanitizedTitle}`;
+
+  return { specificFolderName, mongoDBDate };
+}
 
 // ✅ POST API: Upload Blog
 export async function POST(request) {
   await LoadDB();
 
   const formData = await request.formData();
+  const blogTitle = formData.get("title");
 
-  // ✅ Get Next Blog ID
-  const blogId = await getNextBlogId();
-  const folderName = `blogs/Blog_${blogId}`;
+  // ✅ Get IST Date-Time & Folder Name
+  const { specificFolderName, mongoDBDate } = getISTDateTime(blogTitle);
 
   // ✅ Upload Thumbnail
   const thumbnailImage = formData.get("image");
@@ -85,9 +98,10 @@ export async function POST(request) {
 
   const thumbnailUrl = await uploadImageToCloudinary(
     thumbnailImage,
-    folderName,
+    specificFolderName,
     "thumbnail_image"
   );
+
   console.log("✅ Uploaded Thumbnail URL:", thumbnailUrl);
 
   // ✅ Upload Related Images
@@ -95,31 +109,32 @@ export async function POST(request) {
   console.log("📌 Related Images Received:", relatedImages);
 
   let relatedImageUrls = [];
+
   if (relatedImages.length > 0) {
     relatedImageUrls = await Promise.all(
       relatedImages.map((img, index) =>
-        uploadImageToCloudinary(img, folderName, `related_image_${index + 1}`)
+        uploadImageToCloudinary(img, specificFolderName, `related_image_${index + 1}`)
       )
     );
   }
 
   console.log("✅ Uploaded Related Images URLs:", relatedImageUrls);
 
-  // ✅ Ensure `relatedImageUrls` is stored
+  // ✅ Save Blog Data to MongoDB
   const blogData = {
     thumbnail: thumbnailUrl,
-    relatedImages: relatedImageUrls, // 🔥 Make sure this exists
+    relatedImages: relatedImageUrls,
     tags: formData.get("tags").split(","),
-    title: formData.get("title"),
+    title: blogTitle,
     description: formData.get("description"),
     author: formData.get("author"),
-    createdAt: new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" }), // IST
+    createdAt: mongoDBDate, // Store IST time in MongoDB
     blogContent: formData.get("blogcontent"),
   };
 
   console.log("📌 Final Blog Data Before Saving:", blogData);
 
-  // ✅ Save Blog to MongoDB
+  // ✅ Save Blog to Database
   const savedBlog = await BlogModel.create(blogData);
   console.log("✅ BLOG SAVED TO DATABASE:", savedBlog);
 
