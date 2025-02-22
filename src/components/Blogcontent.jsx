@@ -8,53 +8,61 @@ import blogData from "@/data";
 import { useParams, useRouter } from "next/navigation";
 
 const Blogcontent = () => {
-    const { id } = useParams(); // Get the blog ID from the URL
+    const { id } = useParams(); // ✅ Get blog ID from URL correctly
     const router = useRouter();
 
     const [blog, setBlog] = useState(null);
     const [prevPost, setPrevPost] = useState(null);
     const [nextPost, setNextPost] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    console.log("BLOG ID FROM URL :", id);
+    console.log("BLOG ID FROM URL:", id);
 
     useEffect(() => {
+        if (!id) return;
+    
         const fetchBlog = async () => {
             try {
                 const res = await fetch(`/api/blog?id=${id}`);
                 const data = await res.json();
+    
                 if (data.success) {
-                    setBlog(data.blogs);
+                    setBlog(data.blog);
+                } else {
+                    console.error("Blog not found:", data.message);
                 }
             } catch (error) {
                 console.error("Error fetching blog:", error);
+            } finally {
+                setLoading(false);
             }
         };
-
+    
         const fetchAdjacentBlogs = async () => {
             try {
-                const res = await fetch(`/api/blog`); // Fetch all blogs
+                const res = await fetch(`/api/blog`);
                 const data = await res.json();
-
+    
                 if (data.success) {
-                    const blogs = data.blogs;
-                    const currentIndex = blogs.findIndex(blog => blog._id === id);
-
-                    // Get the previous and next posts
-                    setPrevPost(currentIndex > 0 ? blogs[currentIndex - 1] : null);
-                    setNextPost(currentIndex < blogs.length - 1 ? blogs[currentIndex + 1] : null);
+                    const blogs = data.blogs || [];
+                    const sortedBlogs = blogs.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)); // Ensure correct order
+                    const currentIndex = sortedBlogs.findIndex(blog => String(blog._id) === String(id));
+    
+                    setPrevPost(currentIndex > 0 ? sortedBlogs[currentIndex - 1] : null);
+                    setNextPost(currentIndex < sortedBlogs.length - 1 ? sortedBlogs[currentIndex + 1] : null);
                 }
             } catch (error) {
                 console.error("Error fetching adjacent blogs:", error);
             }
         };
-
+    
         fetchBlog();
         fetchAdjacentBlogs();
     }, [id]);
+    
 
-    if (!blog) {
-        return <p className="text-center text-xl mt-10">Blog not found!</p>;
-    }
+    if (loading) return <p className="text-center text-xl mt-10">Loading...</p>;
+    if (!blog) return <p className="text-center text-xl mt-10">Blog not found!</p>;
 
     return (
         <div className="container mx-auto px-4 lg:px-1 my-20">
