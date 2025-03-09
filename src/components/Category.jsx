@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Image from "next/image";
 import thumbnail from "@/assets/thumbnail.png";
 import { LiaLongArrowAltRightSolid } from "react-icons/lia";
@@ -12,12 +12,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useRoutingHelpers } from "@/utils/helperFn";
 import Loader from "./Loader";
 
-const Categories = () => {
+const CategoriesComps = () => {
 
     const [blogsList, setBlogsList] = useState([]);
-
-    /* const router = useRouter();
-    const { tag } = router.query; // Get the tag from URL */
     const searchParams = useSearchParams();
     const tag = searchParams.get('tag');
 
@@ -199,5 +196,11 @@ const Categories = () => {
 
     );
 };
+
+const Categories = () => {
+    <Suspense fallback={<div>Loading...</div>}>
+      <CategoriesComps />
+    </Suspense>
+}
 
 export default Categories;
