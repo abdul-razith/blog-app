@@ -2,14 +2,113 @@
 @tailwind components;
 @tailwind utilities;
 
+
 body {
-  background-color: aqua;
+  @apply bg-gray-200;
+}
+
+main {
   width: 98%;
   margin-left: 1%;
   margin-right: 1%;
-  @apply mt-6;
 }
 
 /* *{
   border: 1px solid black ;
 } */
+
+
+@layer components {
+  /* Nav Links */
+  .nav-link {
+    @apply relative text-gray-700 dark:text-white font-medium transition-transform duration-200 ease-in-out;
+  }
+
+  .nav-link:hover {
+    @apply scale-105 text-red-500;
+  }
+
+  .nav-link::after {
+    content: "";
+    @apply absolute left-0 bottom-0 w-0 h-0.5 bg-red-500 transition-all duration-300 ease-in-out;
+  }
+
+  .nav-link:hover::after {
+    @apply w-full;
+  }
+
+  /* Title Links */
+  .title-link {
+    @apply relative inline-block transition-transform duration-300 ease-in-out;
+  }
+
+  .title-link:hover {
+    @apply scale-[1.02] text-blue-500;
+  }
+
+  /* Image Hover Scale */
+  .image-hover {
+    @apply transition duration-300 ease-in-out;
+  }
+  .image-hover:hover {
+    @apply transition duration-300 ease-in-out hover:scale-[1.02];
+  }
+}
+
+
+/* Blog Content styles tailwind typogarphy plugin */
+
+@layer components {
+  /* Styling the main blog content inside .blog-content-container */
+  .blog-content-container .prose {
+    /* General typography settings */
+    @apply prose-lg max-w-none leading-8 text-gray-800;
+
+    /* Headings (h1, h2, h3) */
+    @apply prose-h1:text-blue-600 prose-h1:font-extrabold prose-h1:border-b-4 prose-h1:border-blue-400 prose-h1:pb-2; /* H1: Blue, bold, and underlined */
+    @apply prose-h2:text-blue-500 prose-h2:font-bold prose-h2:border-b-2 prose-h2:border-gray-300 prose-h2:pb-1; /* H2: Lighter blue, bold, smaller underline */
+    @apply prose-h3:text-gray-700 prose-h3:font-semibold; /* H3: Dark gray, medium bold */
+
+    /* Paragraphs */
+    @apply prose-p:leading-relaxed prose-p:text-gray-800; /* Relaxed line height for readability */
+
+    /* Unordered list (UL) and list items (LI) */
+    @apply prose-ul:list-disc prose-ul:list-inside prose-ul:text-gray-700; /* Bulleted list */
+    @apply prose-li:ml-0 prose-li:pl-2 prose-li:border-l-4 prose-li:border-blue-400; /* Adds left border to list items */
+
+    /* Tables */
+    @apply prose-table:w-full prose-table:my-4 prose-table:table-auto; /* Full-width table with border */
+    @apply prose-th:bg-blue-100 prose-th:font-semibold prose-th:text-gray-800 prose-th:border prose-th:border-gray-300 prose-th:px-4 prose-th:py-2 prose-th:text-center; /* Table headers: blue background, bold text, left-aligned */
+    @apply prose-td:border prose-td:border-gray-300 prose-td:px-4 prose-td:py-2 prose-td:text-center; /* Table cells: bordered with padding */
+
+    /* Images */
+    @apply prose-img:w-full prose-img:rounded-lg prose-img:shadow-md prose-img:my-4; /* Responsive images with rounded corners & shadow */
+
+    /* Links */
+    @apply prose-a:text-blue-500 prose-a:underline hover:prose-a:text-blue-700; /* Blue links with hover effect */
+
+    /* Blockquotes */
+    @apply prose-blockquote:text-gray-600 prose-blockquote:border-l-4 prose-blockquote:border-gray-300 prose-blockquote:pl-4 prose-blockquote:py-2; /* Gray blockquote with left border */
+
+    /* Inline Code */
+    @apply prose-code:text-gray-600 prose-code:bg-gray-100 prose-code:rounded prose-code:px-2 prose-code:py-1; /* Inline code: gray background, rounded corners */
+
+    /* Preformatted Code Blocks */
+    @apply prose-pre:text-gray-600 prose-pre:bg-gray-100 prose-pre:rounded prose-pre:p-4 prose-pre:overflow-x-auto; /* Code blocks: gray background, rounded, scrollable */
+  }
+
+  /* Add alternating row colors for tables (striped effect) */
+  .prose tr:nth-child(odd) {
+    background-color: #f9fafb; /* Light gray for odd rows */
+  }
+
+  /* Add hover effect to table rows */
+  .prose tr:hover {
+    background-color: #e5e7eb; /* Darker gray on hover */
+  }
+
+  /* Enable horizontal scrolling on small screens */
+  .blog-content-container .prose > table {
+    @apply block overflow-x-auto; /* Makes tables scrollable on smaller screens */
+  }
+}

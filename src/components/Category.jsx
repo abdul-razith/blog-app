@@ -8,10 +8,20 @@ import { BsCalendarDate } from "react-icons/bs";
 import { BiSearch } from "react-icons/bi";
 import blogData from "@/data";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useRoutingHelpers } from "@/utils/helperFn";
+import Loader from "./Loader";
 
 const Categories = () => {
 
     const [blogsList, setBlogsList] = useState([]);
+
+    /* const router = useRouter();
+    const { tag } = router.query; // Get the tag from URL */
+    const searchParams = useSearchParams();
+    const tag = searchParams.get('tag');
+
+    const { handleTagClick } = useRoutingHelpers();
 
     useEffect(() => {
         const fetchBlogs = async () => {
@@ -32,7 +42,7 @@ const Categories = () => {
     const [searchQuery, setSearchQuery] = useState("");
 
     // State for selected tag filter
-    const [selectedTag, setSelectedTag] = useState(null);
+    const [selectedTag, setSelectedTag] = useState(tag || null);
 
     // Get all unique tags for filtering
     const allTags = [...new Set(blogsList.flatMap(post => post.tags))];
@@ -49,9 +59,9 @@ const Categories = () => {
     });
 
     return (
-        <div className="container mx-auto px-4 lg:px-1 my-10">
+        <div className="container mx-auto px-4 lg:px-1 my-10 min-h-screen">
             {/* Page Title */}
-            <h1 className="text-4xl font-bold text-center mb-8">Explore Categories</h1>
+            <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">Explore Categories</h1>
 
             {/* Search Bar & Tag Filter */}
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
@@ -61,7 +71,7 @@ const Categories = () => {
                     <input
                         type="text"
                         placeholder="Search blog posts..."
-                        className="w-full px-3 py-1 outline-none"
+                        className="w-full px-3 py-1 outline-none text-gray-800"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -70,8 +80,7 @@ const Categories = () => {
                 {/* Tag Filter */}
                 <div className="flex flex-wrap gap-3">
                     <button
-                        className={`px-4 py-2 rounded-lg ${!selectedTag ? "bg-red-500 text-white" : "bg-gray-200"
-                            }`}
+                        className={`px-4 py-2 rounded-lg ${!selectedTag ? "bg-red-500 text-white" : "bg-gray-200 text-gray-800 hover:bg-gray-300"}`}
                         onClick={() => setSelectedTag(null)}
                     >
                         All
@@ -79,8 +88,7 @@ const Categories = () => {
                     {allTags.map((tag, index) => (
                         <button
                             key={index}
-                            className={`px-4 py-2 rounded-lg ${selectedTag === tag ? "bg-red-500 text-white" : "bg-gray-200"
-                                }`}
+                            className={`px-4 py-2 rounded-lg ${selectedTag === tag ? "bg-red-500 text-white" : "bg-gray-200 text-gray-800 hover:bg-gray-300"}`}
                             onClick={() => setSelectedTag(tag)}
                         >
                             {tag}
@@ -96,14 +104,14 @@ const Categories = () => {
                     {filteredPosts.length > 0 ? (
                         filteredPosts.map((item, index) => (
                             <React.Fragment key={index}>
-                                <div className="p-6 rounded-xl bg-gray-100 shadow-md flex flex-col lg:flex-row gap-6 items-center">
+                                <div className="p-6 rounded-xl bg-white shadow-md flex flex-col lg:flex-row gap-6 items-center border border-gray-200">
                                     {/* Image Section */}
                                     <div className="w-full lg:w-1/2">
                                         <Link href={`/blog/${item._id}`}>
                                             <Image
                                                 src={item.thumbnail}
                                                 alt="thumbnail-image"
-                                                className="rounded-xl w-full"
+                                                className="image-hover rounded-xl w-full"
                                                 width={500}
                                                 height={300}
                                                 priority
@@ -118,7 +126,8 @@ const Categories = () => {
                                             {item.tags.map((tag, index) => (
                                                 <span
                                                     key={index}
-                                                    className="bg-red-500 text-white px-3 py-1 rounded-full text-sm"
+                                                    className="bg-red-500 text-white px-3 py-1 rounded-full text-sm cursor-pointer hover:bg-red-600"
+                                                    onClick={() => handleTagClick(tag)}
                                                 >
                                                     {tag}
                                                 </span>
@@ -126,8 +135,8 @@ const Categories = () => {
                                         </div>
 
                                         {/* Title */}
-                                        <Link href={`/blog/${item._id}`}>
-                                            <h2 className="text-3xl md:text-4xl font-bold leading-tight">
+                                        <Link href={`/blog/${item._id}`} className="title-link">
+                                            <h2 className="text-3xl md:text-4xl font-bold leading-tigh">
                                                 {item.title}
                                             </h2>
                                         </Link>
@@ -138,7 +147,7 @@ const Categories = () => {
                                         {/* Date */}
                                         <div className="flex items-center gap-2 text-gray-600">
                                             <BsCalendarDate size={20} />
-                                            <time dateTime="2025-02-12">{item.createdAt}</time>
+                                            <time dateTime="2025-02-12">{(item.createdAt).split('T')[0]}</time>
                                         </div>
                                     </div>
                                 </div>
@@ -158,7 +167,9 @@ const Categories = () => {
                             </React.Fragment>
                         ))
                     ) : (
-                        <p className="text-center text-gray-500">No blog posts found.</p>
+                        <div className="flex justify-center">
+                            <Loader />
+                        </div>
                     )}
                 </div>
 
@@ -185,6 +196,7 @@ const Categories = () => {
                 </aside>
             </div>
         </div>
+
     );
 };
 

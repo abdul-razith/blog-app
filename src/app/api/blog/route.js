@@ -7,37 +7,43 @@ const LoadDB = async () => {
   await ConnectDB();
 };
 
-// ✅ GET API: Fetch All Blogs or a Single Blog
+// ✅ GET API: Fetch All Blogs or a Single Blog or Filter by Tag
 export async function GET(request) {
   try {
-    await LoadDB();
-    console.log("GET Blog API Called");
+      await LoadDB();
+      console.log("GET Blog API Called");
 
-    const { searchParams } = new URL(request.url);
-    const blogId = searchParams.get("id");
-    console.log("ROUTE BLOG ID:", blogId);
+      const { searchParams } = new URL(request.url);
+      const blogId = searchParams.get("id");
+      const tag = searchParams.get("tag"); // Get the tag parameter from the URL
+      console.log("ROUTE BLOG ID:", blogId);
+      console.log("ROUTE TAG:", tag);
 
-    if (blogId) {
-      const blog = await BlogModel.findById(blogId);
-      if (!blog) {
-        return NextResponse.json(
-          { success: false, message: "Blog not found" },
-          { status: 404 }
-        );
+      if (blogId) {
+          const blog = await BlogModel.findById(blogId);
+          if (!blog) {
+              return NextResponse.json(
+                  { success: false, message: "Blog not found" },
+                  { status: 404 }
+              );
+          }
+          return NextResponse.json({ success: true, blog }, { status: 200 });
+      } else if (tag) {
+          const blogsByTag = await BlogModel.find({ tags: tag }).sort({ createdAt: -1 });
+          return NextResponse.json({ success: true, blogs: blogsByTag }, { status: 200 });
+      } else {
+          const blogs = await BlogModel.find({}).sort({ createdAt: -1 });
+          return NextResponse.json({ success: true, blogs }, { status: 200 });
       }
-      return NextResponse.json({ success: true, blog }, { status: 200 });
-    } else {
-      const blogs = await BlogModel.find({}).sort({ createdAt: -1 });
-      return NextResponse.json({ success: true, blogs }, { status: 200 });
-    }
   } catch (error) {
-    console.error("Error fetching blogs:", error);
-    return NextResponse.json(
-      { success: false, message: "Failed to fetch blogs" },
-      { status: 500 }
-    );
+      console.error("Error fetching blogs:", error);
+      return NextResponse.json(
+          { success: false, message: "Failed to fetch blogs" },
+          { status: 500 }
+      );
   }
 }
+
 
 // ✅ Get Next Blog ID for Folder Naming
 async function getNextBlogId() {

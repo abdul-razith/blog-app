@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
 
@@ -23,15 +24,14 @@ const Footer = () => {
 
                 {/* Footer Links */}
                 <nav className="flex flex-wrap justify-center gap-4 md:gap-6 text-xs md:text-sm">
-                    <a href="#" className="hover:underline">About</a>
-                    <a href="#" className="hover:underline">Privacy Policy</a>
-                    <a href="#" className="hover:underline">Terms of Service</a>
-                    <a href="#" className="hover:underline">Contact</a>
+                    <Link href="/privacy-policy">Privacy Policy</Link>
+                    <Link href="/terms-and-conditions">Terms & Conditions</Link>
+                    <Link href="/disclaimer">Disclaimer</Link>
                 </nav>
 
                 {/* Copyright */}
                 <div className="text-gray-400 text-xs md:text-sm">
-                    &copy; {new Date().getFullYear()} Your Blog Name. All rights reserved.
+                    &copy; {new Date().getFullYear()} @Fit Life. All rights reserved.
                 </div>
             </div>
         </footer>

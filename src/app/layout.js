@@ -5,6 +5,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { usePathname } from "next/navigation";
+import Script from "next/script";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -19,6 +20,13 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${poppins.className} antialiased`}>
+
+        <Script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_GOOGLE_ADSENCE_CLIENT_ID}`}
+          crossOrigin="anonymous"
+        ></Script>
+
         {!isAdmin && <Header />} {/* Hide Header on Admin Pages */}
         <main>{children}</main>
         {!isAdmin && <Footer />} {/* Hide Footer on Admin Pages */}
