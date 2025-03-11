@@ -1,11 +1,8 @@
-"use client"; // Marking it as a client component
-
+import { Analytics } from "@vercel/analytics/react";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { usePathname } from "next/navigation";
-import Script from "next/script";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -13,23 +10,68 @@ const poppins = Poppins({
   display: "swap",
 });
 
-export default function RootLayout({ children }) {
-  const pathname = usePathname();
-  const isAdmin = pathname.startsWith("/admin"); // Detect admin route
+/* FOR SEO */
 
+export const metadata = {
+  title: {
+    default: "FitLife360 - Your Guide to a Healthy Lifestyle",
+    template: "%s | FitLife360",
+  },
+  description:
+    "Discover expert tips, workouts, and nutrition advice on FitLife360. Your journey to a healthier and happier life starts here.",
+
+  keywords: [
+    "fitness",
+    "health",
+    "workout tips",
+    "nutrition",
+    "weight loss",
+    "muscle gain",
+    "healthy living",
+  ],
+
+  openGraph: {
+    title: "FitLife360 - Your Guide to a Healthy Lifestyle",
+    description:
+      "Stay fit and healthy with our expert fitness tips, diet plans, and workout guides. Join FitLife today!",
+    url: "https://www.fitlife360.life",
+    siteName: "FitLife360",
+    /* images: [
+      {
+        url: "https://www.fitlife.com/og-image.jpg", // Replace with your real Open Graph image URL
+        width: 1200,
+        height: 630,
+        alt: "FitLife - Stay Fit, Stay Healthy",
+      },
+    ], */
+    locale: "en_US",
+    type: "website",
+  },
+
+  /* twitter: {
+    card: "summary_large_image",
+    title: "FitLife - Your Guide to a Healthy Lifestyle",
+    description:
+      "Stay fit and healthy with our expert fitness tips, diet plans, and workout guides. Join FitLife today!",
+    //images: ["https://www.fitlife.com/og-image.jpg"], // Same as Open Graph image
+  }, */
+
+  robots: "index, follow",
+  alternates: {
+    canonical: "https://www.fitlife360.life",
+  },
+};
+
+
+export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${poppins.className} antialiased`}>
-
-        <Script
-          async
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_GOOGLE_ADSENCE_CLIENT_ID}`}
-          crossOrigin="anonymous"
-        ></Script>
-
-        {!isAdmin && <Header />} {/* Hide Header on Admin Pages */}
+        <Header />
         <main>{children}</main>
-        {!isAdmin && <Footer />} {/* Hide Footer on Admin Pages */}
+        <Footer />
+
+        <Analytics />
       </body>
     </html>
   );

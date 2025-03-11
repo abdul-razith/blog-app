@@ -198,9 +198,11 @@ const CategoriesComps = () => {
 };
 
 const Categories = () => {
-    <Suspense fallback={<div>Loading...</div>}>
-      <CategoriesComps />
-    </Suspense>
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <CategoriesComps />
+        </Suspense>
+    )
 }
 
 export default Categories;
