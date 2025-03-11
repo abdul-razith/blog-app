@@ -21,7 +21,8 @@ main {
 @layer components {
   /* Nav Links */
   .nav-link {
-    @apply relative text-gray-700 dark:text-white font-medium transition-transform duration-200 ease-in-out;
+    /* @apply relative text-gray-700 dark:text-white font-medium transition-transform duration-200 ease-in-out; */
+    @apply relative text-white dark:text-white font-medium transition-transform duration-200 ease-in-out;
   }
 
   .nav-link:hover {
@@ -74,7 +75,7 @@ main {
 
     /* Unordered list (UL) and list items (LI) */
     @apply prose-ul:list-disc prose-ul:list-inside prose-ul:text-gray-700; /* Bulleted list */
-    @apply prose-li:ml-0 prose-li:pl-2 prose-li:border-l-4 prose-li:border-blue-400; /* Adds left border to list items */
+    @apply prose-li:ml-0 prose-li:pl-2 prose-li:border-l-2 prose-li:border-blue-400; /* Adds left border to list items */
 
     /* Tables */
     @apply prose-table:w-full prose-table:my-4 prose-table:table-auto; /* Full-width table with border */

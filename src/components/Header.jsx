@@ -31,11 +31,11 @@ const Header = () => {
 
         {/* Navigation Menu */}
         <div
-          className={`absolute w-[98%] pb-3 lg:pb-0 mx-[1%] lg:static lg:w-[60%] xl:w-[50%] top-[3.8rem] md:top-[4.9rem] left-0 bg-gray-900 ${
+          className={`absolute w-[98%] pb-3 lg:pb-0 mx-[1%] lg:static lg:w-[60%] xl:w-[50%] top-[4.0rem] md:top-[5.9rem] left-0 bg-gray-900 ${
             isOpen ? "block" : "hidden"
           } lg:block z-50`}
         >
-          <ul className="relative mx-3 pl-5 py-2 flex flex-col gap-y-4 lg:flex-row lg:justify-between bg-gray-900 lg:text-white rounded-md">
+          <ul className="relative mx-3 pl-5 py-2 flex flex-col gap-y-4 lg:flex-row lg:justify-between bg-gray-900 text-white rounded-md">
             <li className="nav-link">
               <Link href="/" onClick={() => setIsOpen(false)}>Home</Link>
             </li>

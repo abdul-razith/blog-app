@@ -47,7 +47,8 @@ const Main = () => {
                 /* Flexbox Layout */
                 <div className="flex flex-col lg:flex-row gap-6">
                     {/* LEFT SIDE - BLOG POSTS */}
-                    <div className="flex flex-col gap-6 w-full lg:w-3/4">
+                    {/* <div className="flex flex-col gap-6 w-full lg:w-3/4"> */}
+                    <div className="flex flex-col gap-6 w-full">
                         {popularBlogs.map((item, index) => (
                             <React.Fragment key={index}>
                                 <div className="p-6 rounded-xl bg-gray-100 shadow-lg flex flex-col lg:flex-row gap-6 items-center">
@@ -99,7 +100,7 @@ const Main = () => {
                                 </div>
 
                                 {/* Show Ads Between Posts in Mobile View */}
-                                {(index + 1) % 2 === 0 ? (
+                                {/* {(index + 1) % 2 === 0 ? (
                                     <div className="lg:hidden bg-gray-200 text-center p-4 rounded-md">
                                         <Image
                                             src={thumbnail}
@@ -109,13 +110,13 @@ const Main = () => {
                                             height={300}
                                         />
                                     </div>
-                                ) : null}
+                                ) : null} */}
                             </React.Fragment>
                         ))}
                     </div>
 
                     {/* RIGHT SIDE - FIXED ADS (ONLY FOR LAPTOP VIEW) */}
-                    <aside className="hidden lg:flex flex-col gap-6 w-1/4 sticky top-4 h-screen">
+                    {/* <aside className="hidden lg:flex flex-col gap-6 w-1/4 sticky top-4 h-screen">
                         <div className="bg-gray-200 text-center p-4 rounded-md">
                             <Image
                                 src={thumbnail}
@@ -134,7 +135,7 @@ const Main = () => {
                                 height={250}
                             />
                         </div>
-                    </aside>
+                    </aside> */}
                 </div>
             )}
         </div>

@@ -83,7 +83,7 @@ const Blogcontent = () => {
 
   return (
     <div className="container mx-auto px-4 lg:px-1 my-20">
-      <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex flex-col lg:flex-row justify-center gap-6">
 
         {!loading ? (<div className="flex flex-col gap-6 w-full lg:w-3/4">
           <div className="p-6 rounded-xl bg-gray-100 shadow-md flex flex-col gap-6 items-center">
@@ -200,7 +200,7 @@ const Blogcontent = () => {
           </div>
         )}
 
-        <aside className="hidden lg:flex flex-col gap-6 w-1/4 sticky top-4 h-screen">
+        {/* <aside className="hidden lg:flex flex-col gap-6 w-1/4 sticky top-4 h-screen">
           <div className="bg-gray-200 text-center p-4 rounded-md">
             <Image
               src={thumbnail}
@@ -219,7 +219,7 @@ const Blogcontent = () => {
               height={250}
             />
           </div>
-        </aside>
+        </aside> */}
       </div>
     </div>
   );
