@@ -9,7 +9,7 @@ import Loader from "@/components/Loader"; // Import Loader
 
 const Suggested = () => {
   const [suggestBlogs, setSuggestBlogs] = useState([]);
-  const [loading, setLoading] = useState(true); // Loading state
+  const [loading, setLoading] = useState(true);
   const { handleTagClick } = useRoutingHelpers();
 
   useEffect(() => {
@@ -17,42 +17,40 @@ const Suggested = () => {
       try {
         const res = await fetch("/api/blog");
         const data = await res.json();
-        if (data.success) {
-          setSuggestBlogs(data.blogs.slice(0, 4)); // Show only 4 suggested blogs
-        }
+        if (data.success) setSuggestBlogs(data.blogs.slice(0, 4)); // Fetch and limit to 4 blogs
       } catch (error) {
         console.error("Error fetching blogs:", error);
       } finally {
-        setLoading(false); // Stop loading after fetching
+        setLoading(false);
       }
     };
     fetchBlogs();
   }, []);
 
   return (
-    <div className="py-10"> {/* Apply background color to the whole section */}
+    <div className="py-10">
       <div className="container mx-auto px-4">
         {/* Section Title */}
-        <h1 className="text-3xl font-bold text-center mb-6">Suggested Posts</h1>
+        <h1 className="text-4xl font-bold text-center mb-6">Suggested Posts</h1>
 
         {/* Show Loader While Fetching Data */}
         {loading ? (
-          <div className="flex justify-center">
+          <div className="flex justify-center items-center min-h-[200px] py-24">
             <Loader />
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {suggestBlogs.map((post, index) => (
+            {suggestBlogs.map(({ _id, thumbnail, title, tags, createdAt }, index) => (
               <div
                 key={index}
                 className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-300"
               >
                 {/* Thumbnail */}
                 <div className="relative w-full h-48">
-                  <Link href={`/blog/${post._id}`}>
+                  <Link href={`/blog/${_id}`}>
                     <Image
-                      src={post.thumbnail}
-                      alt={post.title}
+                      src={thumbnail}
+                      alt={title}
                       layout="fill"
                       objectFit="cover"
                       className="image-hover rounded-t-xl"
@@ -64,9 +62,9 @@ const Suggested = () => {
                 <div className="p-4 flex flex-col gap-3">
                   {/* Tags */}
                   <div className="flex flex-wrap gap-2">
-                    {post.tags.map((tag, index) => (
+                    {tags.map((tag, i) => (
                       <span
-                        key={index}
+                        key={i}
                         className="bg-red-500 text-white px-3 py-1 rounded-full text-sm cursor-pointer"
                         onClick={() => handleTagClick(tag)}
                       >
@@ -76,16 +74,14 @@ const Suggested = () => {
                   </div>
 
                   {/* Title */}
-                  <Link href={`/blog/${post._id}`} className="title-link">
-                    <h2 className="text-lg font-semibold">
-                      {post.title}
-                    </h2>
+                  <Link href={`/blog/${_id}`} className="title-link">
+                    <h2 className="text-lg font-semibold">{title}</h2>
                   </Link>
 
                   {/* Date */}
                   <div className="flex items-center text-gray-600 text-sm">
                     <BsCalendarDate size={16} className="mr-2" />
-                    <time>{(post.createdAt).split('T')[0]}</time>
+                    <time>{createdAt.split("T")[0]}</time>
                   </div>
                 </div>
               </div>

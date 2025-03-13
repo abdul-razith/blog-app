@@ -9,7 +9,7 @@ let dbConnected = false;
 async function connectToDB() {
   if (!dbConnected) {
     await ConnectDB();
-    dbConnected = true;
+    dbConnected = true; // Set this only after successful connection
   }
 }
 
@@ -18,34 +18,27 @@ export async function generateStaticParams() {
   try {
     await connectToDB();
     const blogs = await BlogModel.find({}, "_id").lean();
-    return blogs.map((blog) => ({ id: blog._id.toString() }));
+    return blogs.map(({ _id }) => ({ id: _id.toString() }));
   } catch (error) {
     console.error("Error generating static params:", error);
     return [];
   }
 }
 
-// ✅ Fix `generateMetadata`
+// ✅ Optimized `generateMetadata`
 export async function generateMetadata({ params }) {
   try {
-    if (!params) { // Check if params exists
+    const id = params?.id;
+
+    if (!id) {
       return {
         title: "Blog Not Found",
         description: "This blog post does not exist.",
       };
     }
 
-    const { id } = await params; // Await params here
-
-    if (!id) { // Check if id exists after awaiting params
-        return {
-          title: "Blog Not Found",
-          description: "This blog post does not exist.",
-        };
-      }
-
     await connectToDB();
-    const blogPost = await BlogModel.findById(id).lean(); // Use awaited id
+    const blogPost = await BlogModel.findById(id).lean();
 
     if (!blogPost) {
       return {
@@ -54,34 +47,36 @@ export async function generateMetadata({ params }) {
       };
     }
 
+    const { title, description, tags, thumbnail } = blogPost;
+
     return {
-      title: `${blogPost.title}`,
-      description: blogPost.description,
-      keywords: blogPost.tags || ["fitness", "health", "nutrition", "workout"],
+      title,
+      description,
+      keywords: tags || ["fitness", "health", "nutrition", "workout"],
       openGraph: {
-        title: `${blogPost.title}`,
-        description: blogPost.description,
-        url: `https://www.fitlife360.life/blog/${id}`, // Use awaited id
+        title,
+        description,
+        url: `https://www.fitlife360.life/blog/${id}`,
         siteName: "FitLife",
         images: [
           {
-            url: blogPost.thumbnail || "https://www.fitlife360.life/default-blog-image.jpg",
+            url: thumbnail || "https://www.fitlife360.life/default-blog-image.jpg",
             width: 1200,
             height: 630,
-            alt: blogPost.title,
+            alt: title,
           },
         ],
         type: "article",
       },
       twitter: {
         card: "summary_large_image",
-        title: `${blogPost.title} | FitLife360 Blog`,
-        description: blogPost.description,
-        images: [blogPost.thumbnail || "https://www.fitlife360.life/default-blog-image.jpg"],
+        title: `${title} | FitLife360 Blog`,
+        description,
+        images: [thumbnail || "https://www.fitlife360.life/default-blog-image.jpg"],
       },
       robots: "index, follow",
       alternates: {
-        canonical: `https://www.fitlife360.life/blog/${id}`, // Use awaited id
+        canonical: `https://www.fitlife360.life/blog/${id}`,
       },
     };
   } catch (error) {

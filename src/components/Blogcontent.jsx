@@ -1,91 +1,74 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import thumbnail from "@/assets/thumbnail.png";
 import { BsCalendarDate } from "react-icons/bs";
 import Image from "next/image";
-import blogData from "@/data";
 import { useParams, useRouter } from "next/navigation";
-import { useRoutingHelpers } from "@/utils/helperFn";
+import { renderBlogContentWithImages, useRoutingHelpers } from "@/utils/helperFn";
 import parse from "html-react-parser";
-import Loader from "@/components/Loader"; // Import Loader component
+import Loader from "@/components/Loader";
 
 const Blogcontent = () => {
   const { id } = useParams();
   const router = useRouter();
+  const { handleTagClick } = useRoutingHelpers();
 
   const [blog, setBlog] = useState(null);
   const [prevPost, setPrevPost] = useState(null);
   const [nextPost, setNextPost] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const { handleTagClick } = useRoutingHelpers();
-
   useEffect(() => {
     if (!id) return;
 
-    const fetchBlog = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch(`/api/blog?id=${id}`);
-        const data = await res.json();
+        const [blogRes, blogsRes] = await Promise.all([
+          fetch(`/api/blog?id=${id}`),
+          fetch(`/api/blog`),
+        ]);
 
-        if (data.success) {
-          setBlog(data.blog);
-        } else {
-          console.error("Blog not found:", data.message);
-        }
-      } catch (error) {
-        console.error("Error fetching blog:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+        const blogData = await blogRes.json();
+        const blogsData = await blogsRes.json();
 
-    const fetchAdjacentBlogs = async () => {
-      try {
-        const res = await fetch(`/api/blog`);
-        const data = await res.json();
+        if (blogData.success) setBlog(blogData.blog);
+        else console.error("Blog not found:", blogData.message);
 
-        if (data.success) {
-          const blogs = data.blogs || [];
-          const sortedBlogs = blogs.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-          const currentIndex = sortedBlogs.findIndex(blog => String(blog._id) === String(id));
+        if (blogsData.success) {
+          const sortedBlogs = (blogsData.blogs || []).sort(
+            (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+          );
+          const currentIndex = sortedBlogs.findIndex((blog) => String(blog._id) === String(id));
 
           setPrevPost(currentIndex > 0 ? sortedBlogs[currentIndex - 1] : null);
           setNextPost(currentIndex < sortedBlogs.length - 1 ? sortedBlogs[currentIndex + 1] : null);
         }
       } catch (error) {
-        console.error("Error fetching adjacent blogs:", error);
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchBlog();
-    fetchAdjacentBlogs();
+    fetchData();
   }, [id]);
 
-  if (!blog)
-    return <p className="text-center text-xl mt-10">Blog not found!</p>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen w-full">
+        <Loader />
+      </div>
+    );
+  }
 
-  const renderBlogContentWithImages = (htmlContent, relatedImages) => {
-    let modifiedContent = htmlContent;
-
-    relatedImages.forEach((imageURL, index) => {
-      const placeholder = `![RELATED_IMAGE_${index + 1}_PLACEHOLDER]`;
-      const imageTag = `<img src="${imageURL}" alt="Related Image ${index + 1}" class="w-full rounded-lg shadow-md my-4" />`;
-
-      modifiedContent = modifiedContent.replace(placeholder, imageTag);
-    });
-
-    return modifiedContent;
-  };
+  if (!blog) return <p className="text-center text-xl mt-10">Blog not found!</p>;
 
   const finalContent = renderBlogContentWithImages(blog.blogContent, blog.relatedImages);
 
   return (
     <div className="container mx-auto px-4 lg:px-1 my-20">
       <div className="flex flex-col lg:flex-row justify-center gap-6">
-
-        {!loading ? (<div className="flex flex-col gap-6 w-full lg:w-3/4">
+        <div className="flex flex-col gap-6 w-full lg:w-3/4">
           <div className="p-6 rounded-xl bg-gray-100 shadow-md flex flex-col gap-6 items-center">
             <div className="w-full">
               <Image
@@ -113,8 +96,8 @@ const Blogcontent = () => {
 
               <div className="flex items-center gap-2 text-gray-600">
                 <BsCalendarDate size={20} />
-                <time dateTime={(blog.createdAt).split('T')[0]}>
-                  {(blog.createdAt).split('T')[0]}
+                <time dateTime={blog.createdAt.split("T")[0]}>
+                  {blog.createdAt.split("T")[0]}
                 </time>
               </div>
 
@@ -194,32 +177,19 @@ const Blogcontent = () => {
               )}
             </div>
           </div>
-        </div>) : (
-          <div className="flex justify-center items-center h-screen w-full">
-            <Loader />
-          </div>
-        )}
+        </div>
 
-        {/* <aside className="hidden lg:flex flex-col gap-6 w-1/4 sticky top-4 h-screen">
+        {/* Optimized Commented Code: Ad Placeholders */}
+        {/* 
+        <aside className="hidden lg:flex flex-col gap-6 w-1/4 sticky top-4 h-screen">
           <div className="bg-gray-200 text-center p-4 rounded-md">
-            <Image
-              src={thumbnail}
-              alt="Ad Placeholder 2"
-              className="rounded-xl w-full"
-              width={300}
-              height={250}
-            />
+            <Image src={blog.thumbnail} alt="Ad Placeholder 2" className="rounded-xl w-full" width={300} height={250} />
           </div>
           <div className="bg-gray-200 text-center p-4 rounded-md">
-            <Image
-              src={thumbnail}
-              alt="Ad Placeholder 3"
-              className="rounded-xl w-full"
-              width={300}
-              height={250}
-            />
+            <Image src={blog.thumbnail} alt="Ad Placeholder 3" className="rounded-xl w-full" width={300} height={250} />
           </div>
-        </aside> */}
+        </aside> 
+        */}
       </div>
     </div>
   );

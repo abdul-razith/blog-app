@@ -1,19 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import thumbnail from "@/assets/thumbnail.png";
-import { LiaLongArrowAltRightSolid } from "react-icons/lia";
-import { BsCalendarDate } from "react-icons/bs";
 import Image from "next/image";
-import blogData from "@/data";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { handleTagClick, useRoutingHelpers } from "@/utils/helperFn";
-import Loader from "@/components/Loader"; // Import the Loader component
+import { BsCalendarDate } from "react-icons/bs";
+import { useRoutingHelpers } from "@/utils/helperFn";
+import Loader from "@/components/Loader";
+import thumbnail from "@/assets/thumbnail.png"; // Ad Placeholder
 
 const Main = () => {
     const [popularBlogs, setPopularBlogs] = useState([]);
-    const [loading, setLoading] = useState(true); // Loading state
+    const [loading, setLoading] = useState(true);
     const { handleTagClick } = useRoutingHelpers();
 
     useEffect(() => {
@@ -21,35 +18,31 @@ const Main = () => {
             try {
                 const res = await fetch("/api/blog");
                 const data = await res.json();
-                if (data.success) {
-                    setPopularBlogs(data.blogs);
-                }
+                if (data.success) setPopularBlogs(data.blogs);
             } catch (error) {
                 console.error("Error fetching blogs:", error);
             } finally {
-                setLoading(false); // Stop loading after fetching
+                setLoading(false);
             }
         };
         fetchBlogs();
     }, []);
 
     return (
-        <div className="container mx-auto px-4 lg:px-1 my-20">
+        <div className="container mx-auto px-4 lg:px-1 my-12 min-h-[200px]">
             {/* Page Title */}
-            <h1 className="text-4xl font-bold text-center mb-10 text-gray-900">Popular Blogs</h1>
+            <h1 className="text-4xl font-bold text-center mb-6">Popular Blogs</h1>
 
             {/* Show Loader While Fetching Data */}
             {loading ? (
-                <div className="flex justify-center">
+                <div className="flex justify-center items-center min-h-[200px] py-24">
                     <Loader />
                 </div>
             ) : (
-                /* Flexbox Layout */
                 <div className="flex flex-col lg:flex-row gap-6">
                     {/* LEFT SIDE - BLOG POSTS */}
-                    {/* <div className="flex flex-col gap-6 w-full lg:w-3/4"> */}
                     <div className="flex flex-col gap-6 w-full">
-                        {popularBlogs.map((item, index) => (
+                        {popularBlogs.slice(0, 4).map((item, index) => (
                             <React.Fragment key={index}>
                                 <div className="p-6 rounded-xl bg-gray-100 shadow-lg flex flex-col lg:flex-row gap-6 items-center">
                                     {/* Image Section */}
@@ -70,9 +63,9 @@ const Main = () => {
                                     <div className="flex flex-col gap-4 w-full lg:w-1/2">
                                         {/* Tags */}
                                         <div className="flex flex-wrap gap-2">
-                                            {item.tags.map((tag, index) => (
+                                            {item.tags.map((tag, idx) => (
                                                 <span
-                                                    key={index}
+                                                    key={idx}
                                                     className="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-full text-sm cursor-pointer"
                                                     onClick={() => handleTagClick(tag)}
                                                 >
@@ -94,13 +87,16 @@ const Main = () => {
                                         {/* Date */}
                                         <div className="flex items-center gap-2 text-gray-600">
                                             <BsCalendarDate size={20} />
-                                            <time dateTime="2025-02-12">{(item.createdAt).split('T')[0]}</time>
+                                            <time dateTime={item.createdAt.split("T")[0]}>
+                                                {item.createdAt.split("T")[0]}
+                                            </time>
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Show Ads Between Posts in Mobile View */}
-                                {/* {(index + 1) % 2 === 0 ? (
+                                {/* Ads will appear after every 2nd post in mobile view */}
+                                {/* {index % 2 === 1 && (
                                     <div className="lg:hidden bg-gray-200 text-center p-4 rounded-md">
                                         <Image
                                             src={thumbnail}
@@ -110,32 +106,29 @@ const Main = () => {
                                             height={300}
                                         />
                                     </div>
-                                ) : null} */}
+                                )} */}
                             </React.Fragment>
                         ))}
                     </div>
 
                     {/* RIGHT SIDE - FIXED ADS (ONLY FOR LAPTOP VIEW) */}
-                    {/* <aside className="hidden lg:flex flex-col gap-6 w-1/4 sticky top-4 h-screen">
-                        <div className="bg-gray-200 text-center p-4 rounded-md">
-                            <Image
-                                src={thumbnail}
-                                alt="Ad Placeholder 2"
-                                className="rounded-xl w-full"
-                                width={300}
-                                height={250}
-                            />
-                        </div>
-                        <div className="bg-gray-200 text-center p-4 rounded-md">
-                            <Image
-                                src={thumbnail}
-                                alt="Ad Placeholder 3"
-                                className="rounded-xl w-full"
-                                width={300}
-                                height={250}
-                            />
-                        </div>
-                    </aside> */}
+                    {/* Ads section optimized and uncommented only if required */}
+                    {/* Uncomment the below block if you want fixed ads on laptops */}
+                    {/* 
+                    <aside className="hidden lg:flex flex-col gap-6 w-1/4 sticky top-4 h-screen">
+                        {[...Array(2)].map((_, i) => (
+                            <div key={i} className="bg-gray-200 text-center p-4 rounded-md">
+                                <Image
+                                    src={thumbnail}
+                                    alt={`Ad Placeholder ${i + 1}`}
+                                    className="rounded-xl w-full"
+                                    width={300}
+                                    height={250}
+                                />
+                            </div>
+                        ))}
+                    </aside> 
+                    */}
                 </div>
             )}
         </div>
