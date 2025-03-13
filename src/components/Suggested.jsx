@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react";
 import { BsCalendarDate } from "react-icons/bs";
 import Link from "next/link";
 import { useRoutingHelpers } from "@/utils/helperFn";
-import Loader from "@/components/Loader"; // Import Loader
+import PageLoader from "./PageLoader";
 
 const Suggested = () => {
   const [suggestBlogs, setSuggestBlogs] = useState([]);
@@ -36,7 +36,7 @@ const Suggested = () => {
         {/* Show Loader While Fetching Data */}
         {loading ? (
           <div className="flex justify-center items-center min-h-[200px] py-24">
-            <Loader />
+            <PageLoader message="Fetching suggested posts..." />
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -46,14 +46,14 @@ const Suggested = () => {
                 className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-300"
               >
                 {/* Thumbnail */}
-                <div className="relative w-full h-48">
+                <div className="relative w-full h-44 md:h-60">
                   <Link href={`/blog/${_id}`}>
                     <Image
                       src={thumbnail}
                       alt={title}
                       layout="fill"
                       objectFit="cover"
-                      className="image-hover rounded-t-xl"
+                      className="rounded-t-2xl image-hover"
                     />
                   </Link>
                 </div>
@@ -65,7 +65,7 @@ const Suggested = () => {
                     {tags.map((tag, i) => (
                       <span
                         key={i}
-                        className="bg-red-500 text-white px-3 py-1 rounded-full text-sm cursor-pointer"
+                        className="bg-red-500 text-white px-3 py-1 rounded-full text-sm cursor-pointer hover:bg-gray-800 transition"
                         onClick={() => handleTagClick(tag)}
                       >
                         {tag}
@@ -80,8 +80,8 @@ const Suggested = () => {
 
                   {/* Date */}
                   <div className="flex items-center text-gray-600 text-sm">
-                    <BsCalendarDate size={16} className="mr-2" />
-                    <time>{createdAt.split("T")[0]}</time>
+                    <BsCalendarDate size={18} className="mr-2" />
+                    <time dateTime={createdAt.split("T")[0]}>{new Date(createdAt).toLocaleDateString()}</time>
                   </div>
                 </div>
               </div>

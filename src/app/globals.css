@@ -44,7 +44,7 @@ main {
   }
 
   .title-link:hover {
-    @apply scale-[1.02] text-blue-500;
+    @apply scale-[1.02] underline underline-offset-4;
   }
 
   /* Image Hover Scale */

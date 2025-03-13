@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { renderBlogContentWithImages, useRoutingHelpers } from "@/utils/helperFn";
 import parse from "html-react-parser";
-import Loader from "@/components/Loader";
+import PageLoader from "./PageLoader";
 
 const Blogcontent = () => {
   const { id } = useParams();
@@ -56,7 +56,7 @@ const Blogcontent = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen w-full">
-        <Loader />
+        <PageLoader message="Loading blog content..." />
       </div>
     );
   }
@@ -66,17 +66,17 @@ const Blogcontent = () => {
   const finalContent = renderBlogContentWithImages(blog.blogContent, blog.relatedImages);
 
   return (
-    <div className="container mx-auto px-4 lg:px-1 my-20">
+    <div className="container mx-auto px-4 lg:px-8 xl:px-2 my-20">
       <div className="flex flex-col lg:flex-row justify-center gap-6">
-        <div className="flex flex-col gap-6 w-full lg:w-3/4">
-          <div className="p-6 rounded-xl bg-gray-100 shadow-md flex flex-col gap-6 items-center">
-            <div className="w-full">
+        <div className="flex flex-col gap-6 w-full lg:w-[65%]">
+          <div className="p-6 rounded-2xl bg-gray-100 shadow-md flex flex-col gap-6 items-center">
+            <div className="w-full relative h-[300px] md:h-[400px]">
               <Image
                 src={blog.thumbnail}
-                alt="thumbnail-image"
-                className="rounded-xl w-full"
-                width={500}
-                height={300}
+                alt={`Thumbnail for ${blog.title}`}
+                className="rounded-2xl object-cover w-full h-full"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
                 priority
               />
             </div>
@@ -86,7 +86,7 @@ const Blogcontent = () => {
                 {blog.tags.map((tag, index) => (
                   <span
                     key={index}
-                    className="bg-red-500 text-white px-3 py-1 rounded-full text-sm cursor-pointer"
+                    className="bg-red-500 text-white px-3 py-1 rounded-full text-sm cursor-pointer hover:bg-gray-800 transition"
                     onClick={() => handleTagClick(tag)}
                   >
                     {tag}
@@ -95,19 +95,19 @@ const Blogcontent = () => {
               </div>
 
               <div className="flex items-center gap-2 text-gray-600">
-                <BsCalendarDate size={20} />
+                <BsCalendarDate size={18} />
                 <time dateTime={blog.createdAt.split("T")[0]}>
-                  {blog.createdAt.split("T")[0]}
+                  {new Date(blog.createdAt).toLocaleDateString()}
                 </time>
               </div>
 
-              <h2 className="text-3xl text-gray-900 md:text-4xl font-bold leading-tight">
+              <h2 className="text-2xl md:text-3xl font-bold leading-snug md:leading-tight">
                 {blog.title}
               </h2>
 
               <div>
                 <h2 className="text-xl font-bold">Description</h2>
-                <p className="text-gray-700">{blog.description}</p>
+                <p className="text-gray-700 line-clamp-3 md:line-clamp-4">{blog.description}</p>
               </div>
 
               <div className="blog-content-container">{parse(finalContent)}</div>
