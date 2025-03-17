@@ -4,13 +4,14 @@ import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import { BsCalendarDate } from "react-icons/bs";
 import Link from "next/link";
-import { useRoutingHelpers } from "@/utils/helperFn";
+import { formatDate, useRoutingHelpers } from "@/utils/helperFn";
 import PageLoader from "./PageLoader";
 
-const Suggested = () => {
-  const [suggestBlogs, setSuggestBlogs] = useState([]);
-  const [loading, setLoading] = useState(true);
+const Suggested = ({ blogs }) => {
   const { handleTagClick } = useRoutingHelpers();
+
+  /* const [suggestBlogs, setSuggestBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -25,7 +26,7 @@ const Suggested = () => {
       }
     };
     fetchBlogs();
-  }, []);
+  }, []); */
 
   return (
     <div className="py-10">
@@ -34,29 +35,31 @@ const Suggested = () => {
         <h1 className="text-4xl font-bold text-center mb-6">Suggested Posts</h1>
 
         {/* Show Loader While Fetching Data */}
-        {loading ? (
+        {blogs.length === 0 ? (
           <div className="flex justify-center items-center min-h-[200px] py-24">
             <PageLoader message="Fetching suggested posts..." />
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {suggestBlogs.map(({ _id, thumbnail, title, tags, createdAt }, index) => (
+            {blogs.map(({ _id, thumbnail, title, tags, createdAt }, index) => (
               <div
                 key={index}
                 className="bg-white shadow-md rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-300"
               >
                 {/* Thumbnail */}
+
                 <div className="relative w-full h-44 md:h-60">
                   <Link href={`/blog/${_id}`}>
                     <Image
                       src={thumbnail}
                       alt={title}
-                      layout="fill"
-                      objectFit="cover"
+                      fill
+                      style={{ objectFit: "cover" }}
                       className="rounded-t-2xl image-hover"
                     />
                   </Link>
                 </div>
+
 
                 {/* Blog Details */}
                 <div className="p-4 flex flex-col gap-3">
@@ -79,10 +82,9 @@ const Suggested = () => {
                   </Link>
 
                   {/* Date */}
-                  <div className="flex items-center text-gray-600 text-sm">
-                    <BsCalendarDate size={18} className="mr-2" />
-                    <time dateTime={createdAt.split("T")[0]}>{new Date(createdAt).toLocaleDateString()}</time>
-                  </div>
+                  <time dateTime={createdAt.split("T")[0]}>
+                    {formatDate(createdAt)}
+                  </time>
                 </div>
               </div>
             ))}

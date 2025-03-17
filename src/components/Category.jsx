@@ -6,18 +6,17 @@ import Link from "next/link";
 import { BsCalendarDate } from "react-icons/bs";
 import { BiSearch } from "react-icons/bi";
 import { useSearchParams } from "next/navigation";
-import { useRoutingHelpers } from "@/utils/helperFn";
+import { formatDate, useRoutingHelpers } from "@/utils/helperFn";
 import PageLoader from "./PageLoader";
 
-const CategoriesComps = () => {
-  const [blogsList, setBlogsList] = useState([]);
+const CategoriesComps = ({blogs}) => {
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(true); // Add loading state
   const searchParams = useSearchParams();
   const selectedTag = searchParams.get("tag");
   const { handleTagClick } = useRoutingHelpers();
 
-  useEffect(() => {
+  /* useEffect(() => {
     const fetchBlogs = async () => {
       try {
         setLoading(true); // Start loading
@@ -33,13 +32,13 @@ const CategoriesComps = () => {
       }
     };
     fetchBlogs();
-  }, []);
+  }, []); */
 
   // Get all unique tags
-  const allTags = [...new Set(blogsList.flatMap((post) => post.tags))];
+  const allTags = [...new Set(blogs.flatMap((post) => post.tags))];
 
   // Filtered blog posts
-  const filteredPosts = blogsList.filter((post) => {
+  const filteredPosts = blogs.filter((post) => {
     const matchesSearch =
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -100,11 +99,7 @@ const CategoriesComps = () => {
       <div className="flex flex-col lg:flex-row gap-6">
         {/* LEFT SIDE - BLOG POSTS */}
         <div className="flex flex-col gap-6 w-full">
-          {loading ? ( // Show loader while loading
-            <div className="flex flex-col justify-center items-center gap-6 h-screen w-full">
-              <PageLoader message="Loading categories..." />
-            </div>
-          ) : filteredPosts.length > 0 ? ( // Show posts if available
+          {filteredPosts.length > 0 ? ( // Show posts if available
             filteredPosts.map((item, index) => (
               <React.Fragment key={index}>
                 <div className="p-4 rounded-2xl bg-gray-100 shadow-md flex flex-col lg:flex-row gap-4 items-center">
@@ -150,7 +145,7 @@ const CategoriesComps = () => {
                     <div className="flex items-center gap-2 text-gray-600">
                       <BsCalendarDate size={18} />
                       <time dateTime={item.createdAt.split("T")[0]}>
-                        {new Date(item.createdAt).toLocaleDateString()}
+                        {formatDate(item.createdAt)}
                       </time>
                     </div>
                   </div>
@@ -171,11 +166,11 @@ const CategoriesComps = () => {
                 )} */}
               </React.Fragment>
             ))
-          ) : !loading ? ( // Show "Blog not found" message when not loading and no posts
+          ) : ( // Show "Blog not found" message when not loading and no posts
             <div className="flex flex-col justify-center items-center gap-6 h-screen w-full">
               <p className="text-xl text-gray-600">No blogs found matching your search.</p>
             </div>
-          ) : null}
+          )}
         </div>
 
         {/* RIGHT SIDE - FIXED ADS (ONLY FOR LAPTOP VIEW) */}

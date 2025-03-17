@@ -94,3 +94,13 @@ export function getISTDateTime(blogTitle) {
 
   return { specificFolderName, mongoDBDate };
 }
+
+
+/* Formate date into February 12, 2025 */
+export const formatDate = (dateString) => {
+  return new Date(dateString).toLocaleDateString("en-US", { 
+    year: "numeric", 
+    month: "long", 
+    day: "numeric" 
+  });
+};

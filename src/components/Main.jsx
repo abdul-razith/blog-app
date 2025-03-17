@@ -4,14 +4,15 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { BsCalendarDate } from "react-icons/bs";
-import { useRoutingHelpers } from "@/utils/helperFn";
+import { formatDate, useRoutingHelpers } from "@/utils/helperFn";
 import thumbnail from "@/assets/thumbnail.png"; // Ad Placeholder
 import PageLoader from "./PageLoader";
 
-const Main = () => {
-  const [popularBlogs, setPopularBlogs] = useState([]);
-  const [loading, setLoading] = useState(true);
+const Main = ({ blogs }) => {
   const { handleTagClick } = useRoutingHelpers();
+
+  /* const [popularBlogs, setPopularBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -27,7 +28,7 @@ const Main = () => {
       }
     };
     fetchBlogs();
-  }, []);
+  }, []); */
 
   return (
     <div className="container mx-auto px-4 lg:px-8 xl:px-2 my-12 min-h-[200px]">
@@ -35,7 +36,7 @@ const Main = () => {
       <h1 className="text-3xl md:text-4xl font-bold text-center mb-6">Popular Blogs</h1>
 
       {/* Show Loader While Fetching Data */}
-      {loading ? (
+      {blogs.length === 0 ? (
         <div className="flex justify-center items-center min-h-[200px] py-24">
           <PageLoader message="Fetching popular posts..." />
         </div>
@@ -43,7 +44,7 @@ const Main = () => {
         <div className="flex flex-col lg:flex-row gap-6">
           {/* LEFT SIDE - BLOG POSTS */}
           <div className="flex flex-col gap-6 w-full">
-            {popularBlogs.slice(0, 4).map((item, index) => (
+            {blogs.slice(0, 4).map((item, index) => (
               <React.Fragment key={index}>
                 <div className="p-4 rounded-2xl bg-gray-100 shadow-md flex flex-col lg:flex-row gap-4 items-center">
                   {/* Image Section */}
@@ -52,13 +53,15 @@ const Main = () => {
                       <Image
                         src={item.thumbnail}
                         alt={`Thumbnail for ${item.title}`}
-                        className="rounded-2xl object-cover w-full h-full image-hover"
+                        className="rounded-2xl image-hover"
                         fill
                         sizes="(max-width: 768px) 100vw, 50vw"
                         priority
+                        style={{ objectFit: "cover" }} // Correct way to apply object-fit
                       />
                     </Link>
                   </div>
+
 
                   {/* Content Section */}
                   <div className="flex flex-col gap-3 w-full lg:w-1/2">
@@ -89,8 +92,9 @@ const Main = () => {
                     <div className="flex items-center gap-2 text-gray-600">
                       <BsCalendarDate size={18} />
                       <time dateTime={item.createdAt.split("T")[0]}>
-                        {new Date(item.createdAt).toLocaleDateString()}
+                        {formatDate(item.createdAt)}
                       </time>
+
                     </div>
                   </div>
                 </div>

@@ -88,11 +88,18 @@ export async function generateMetadata({ params }) {
   }
 }
 
-export default function BlogPage() {
+const getBlogs = async () => {
+  const res = await fetch("http://localhost:3000/api/blog", { cache: "no-store" }); // Avoid caching for fresh data
+  const data = await res.json();
+  return data.success ? data.blogs : [];
+};
+
+export default async function BlogPage() {
+  const blogs = await getBlogs(); // Fetch data once on the server
   return (
     <div>
       <Blogcontent />
-      <Suggested />
+      <Suggested blogs={blogs} />
     </div>
   );
 }

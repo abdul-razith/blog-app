@@ -10,14 +10,15 @@ import { LiaLongArrowAltRightSolid } from "react-icons/lia";
 import { BsCalendarDate } from "react-icons/bs";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Link from "next/link";
-import { useRoutingHelpers } from "@/utils/helperFn";
+import { formatDate, useRoutingHelpers } from "@/utils/helperFn";
 import PageLoader from "./PageLoader";
 
-const Hero = () => {
+const Hero = ({ blogs }) => {
   const swiperRef = useRef(null);
-  const [recentBlog, setRecentBlog] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
   const { handleTagClick } = useRoutingHelpers();
+
+  /* const [recentBlog, setRecentBlog] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -33,11 +34,11 @@ const Hero = () => {
       }
     };
     fetchBlogs();
-  }, []);
+  }, []); */
 
   return (
     <div className="relative py-4 mt-3 md:py-6">
-      {isLoading ? (
+      {blogs.length === 0 ? (
         <div className="flex justify-center items-center min-h-[200px] py-24">
           <PageLoader message="Slider is loading..." />
         </div>
@@ -69,7 +70,7 @@ const Hero = () => {
               1280: { slidesPerView: 1.5 },
             }}
           >
-            {recentBlog.slice(0, 3).map(({ _id, thumbnail, tags, title, description, createdAt }, index) => (
+            {blogs.slice(0, 3).map(({ _id, thumbnail, tags, title, description, createdAt }, index) => (
               <SwiperSlide key={index}>
                 <div className="p-4 md:p-6 rounded-lg">
                   <div className="flex flex-col lg:flex-row gap-4 md:gap-6 items-center">
@@ -124,8 +125,9 @@ const Hero = () => {
                       <div className="flex items-center gap-2 text-gray-500 text-sm">
                         <BsCalendarDate size={16} />
                         <time dateTime={createdAt.split("T")[0]}>
-                          {new Date(createdAt).toLocaleDateString()}
+                          {formatDate(createdAt)}
                         </time>
+
                       </div>
                     </div>
                   </div>
