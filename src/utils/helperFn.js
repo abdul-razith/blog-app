@@ -26,7 +26,8 @@ export const useRoutingHelpers = () => {
           params.delete("tag"); // Ensure tag is removed
       }
 
-      router.push(`?${params.toString()}`, { scroll: false });
+      //router.push(`?${params.toString()}`, { scroll: false });
+      router.push(`category/?${params.toString()}`, { scroll: false });
   };
 
   return { handleTagClick };

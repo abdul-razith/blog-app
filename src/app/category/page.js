@@ -22,20 +22,12 @@ export const metadata = {
   },
 };
 
-const getBlogs = async () => {
-  const res = await fetch("http://localhost:3000/api/blog", { cache: "no-store" }); // Avoid caching for fresh data
-  const data = await res.json();
-  return data.success ? data.blogs : [];
-};
 
 
-
-export default async function Home() {
-  const blogs = await getBlogs(); // Fetch data once on the server
-
+export default function Home() {
   return (
     <div>
-        <Categories blogs={blogs} />
+        <Categories />
     </div>
   );
 }

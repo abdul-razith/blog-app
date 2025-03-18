@@ -28,7 +28,7 @@ export async function generateStaticParams() {
 // ✅ Optimized `generateMetadata`
 export async function generateMetadata({ params }) {
   try {
-    const id = params?.id;
+    const {id} = await params;
 
     if (!id) {
       return {
@@ -89,7 +89,7 @@ export async function generateMetadata({ params }) {
 }
 
 const getBlogs = async () => {
-  const res = await fetch("http://localhost:3000/api/blog", { cache: "no-store" }); // Avoid caching for fresh data
+  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/blog`);
   const data = await res.json();
   return data.success ? data.blogs : [];
 };
